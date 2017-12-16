@@ -26,7 +26,8 @@ const nodes = [{ "node": 1, "message": "珍しいビールを味わってみた�
 	       { "node": 7, "message": "今日はちょっと辛いことがあった〜", "yes": 10, "no": 11 },
 
 	       // Answers & descriptions
-	       { "node": 8, "message":  " セント・ベルナルデュス・アプト " , "yes": 0, "no": 0, "description":  " 柑橘系の香り、濃厚なフルボディ、高めのアルコール度数と、あらゆる面で味わい深い、ベルギービールの中でも最高級と言われる一品。ベルギー北西部、西フランダース産。海が近い土地柄か、ムール貝、エビなど魚介類に合うビールを産する醸造所が多いとのことだが、このビールも、ピッタリ。 "},
+	       { "node": 8, "message":  " セント・ベルナルデュス・アプト " , "yes": 0, "no": 0, 
+		 "description":  " 柑橘系の香り、濃厚なフルボディ、高めのアルコール度数と、あらゆる面で味わい深い、ベルギービールの中でも最高級と言われる一品。ベルギー北西部、西フランダース産。海が近い土地柄か、ムール貝、エビなど魚介類に合うビールを産する醸造所が多いとのことだが、このビールも、ピッタリ。 "},
 	       { "node": 9, "message":  " カンティロン・フランボワーズ " , "yes": 0, "no": 0, "description":  " FRAMBOISE は木イチゴ、ラズベリー。ランビックの酸味に、木イチゴのほのかな味わいが感じられる、上品なフルーツランビックビール。 "},
 	       { "node": 10, "message":  " ビーケン " , "yes": 0, "no": 0, "description":  " 蜂蜜入りビール！ホップの苦さのほうが目立つ。蜂蜜の味は、甘さというより濃厚さに感じる。 "},
 	       { "node": 11, "message":  " シャポー・ウィンター・グース " , "yes": 0, "no": 0, "description":  " 各種フルーツビールで有名なシャポーのクリスマス限定ビール。「各種」をすべて混ぜ合わせたような、何種類ものフルーティさを感じさせ、さらにグーズ、ランビックの酸っぱさがほんのり感じられる、クリスマスビールの定番ともいえる一品。 "},
@@ -78,7 +79,16 @@ const promptToStartMessage = "開始する場合は「はい」、終了する�
 const promptToSayYesNo = "「はい」か「いいえ」でお答えください。";
 
 // This is the response to the user after the final question when Alexa decides on what group choice the user should be given
-const decisionMessage = "あなたにぴったりな一品は！";
+const decisionMessage = "あなたにぴったりな一品は>";
+
+const questionMessage = "質問です。>";
+
+const decisionEndMessage = "です。<break time=\"500ms\"/>";
+
+const descriptionStartMessage = "の説明です";
+
+const pause500ms = "<break time=\"500ms\"/>";
+const pause100ms = "<break time=\"100ms\"/>";
 
 // This is the prompt to ask the user if they would like to hear a short description of their chosen profession or to play again
 const playAgainMessage = "詳しい説明を聞きたいですか？「はい」か「いいえ」でお答えください。 ";
@@ -88,6 +98,8 @@ const helpMessage = "ぴったりなベルビーギールを探す為にあな�
 
 // This is the goodbye message when the user has asked to quit the game
 const goodbyeMessage = "さようなら、またお会いしましょう！";
+
+const letsEnjoyMessage = "是非お楽しみください！";
 
 const speechNotFoundMessage = "Could not find speech for node";
 
@@ -154,6 +166,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
 
 	// ask first question, the response will be handled in the askQuestionHandler
 	let message = helper.getSpeechForNode(START_NODE);
+	message = questionMessage + pause500ms + message;
 
 	// record the node we are on
 	this.attributes.currentNode = START_NODE;
@@ -289,7 +302,13 @@ const helper = {
 
 	// get the speech for the child node
 	let description = helper.getDescriptionForNode(context.attributes.currentNode);
-	let message = description + ', ' + repeatWelcomeMessage;
+
+	let beername = helper.getSpeechForNode(context.attributes.currentNode);
+
+	let message = beername + pause100ms + descriptionStartMessage + pause500ms + description + pause500ms;
+	let enjoy = beername + pause100ms + letsEnjoyMessage;
+	message = message + enjoy ;
+
 	console.log(message);
 	context.response.speak(message);
     },
@@ -320,7 +339,9 @@ const helper = {
 	    context.handler.state = states.DESCRIPTIONMODE;
 
 	    // append the play again prompt to the decision and speak it
-	    message = decisionMessage + ' ' + message + ' ,' + playAgainMessage;
+	    message = decisionMessage + pause500ms + message + decisionEndMessage + playAgainMessage;
+	} else {
+	    message = questionMessage + pause500ms + message;
 	}
 
 	// set the current node to next node we want to go to
