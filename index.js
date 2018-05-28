@@ -99,6 +99,8 @@ const helpMessage = "ぴったりなベルビーギールを探す為にあな�
 // This is the goodbye message when the user has asked to quit the game
 const goodbyeMessage = "さようなら、またお会いしましょう！";
 
+
+
 const letsEnjoyMessage = "是非お楽しみください！";
 
 const speechNotFoundMessage = "Could not find speech for node";
